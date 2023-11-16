@@ -31,4 +31,69 @@ The syntax for `dotter`'s configurations and supported formats are discussed in 
 
 ## Flexibility
 
+`dotter` should provide the flexibility to work with the following
+
+- Arbitrarily organized "dotfiles" repositories
+- Hotswapping of individual program configurations
+
+### Repository structure
+
+- Organized by application/program
+
+```
+├── git
+│   └── config.toml
+├── ssh
+│   ├── config
+├── vim
+│   └── config.vim
+└── zsh
+    ├── aliases.zsh
+    ├── config.zsh
+    └── functions.zsh
+```
+
+- Organized by system type
+
+```
+├── any
+│   ├── git
+│   │   └── config.toml
+│   └── ssh
+│       └── config
+├── nt
+│   └── powershell
+│       └── config.json
+└── unix
+    ├── bash
+    │   └── config.sh
+    ├── vim
+    │   └── config.vim
+    └── zsh
+        └── config.zsh
+```
+
+The snippets above are a couple of example ways that a "dotfiles" repository might be organized. `dotter` should aim not to impose any particular structure, but instead will use its own configuration to navigate a user's "dotfiles" repository. 
+
 ## Automation
+
+### Mundane tasks
+
+`dotter` aims to provide a quick and consistent way to address the following "dotfiles" tasks
+
+- Activating a program's configurations (symlink or copy the configuration to its required location)
+- Deactivating a program's configurations (prune the symlink or remove the copied configuration file(s))
+- Swapping out a program's configurations (for user's that have separate configurations for the same program/application)
+- Checking the status of a program's configuration (active/inactive?)
+
+### Bootstrapping a new system
+
+`dotter` shall provide a well-defined process for initializing a new system
+
+1) An initialization command where the location of the "dotfile" repository is specified and `dotter`'s configuration is discovered within
+2) `dotter` links up its (via copy) configuration to be used on future runs
+3) `dotter` can be used as normal
+
+### Unattended
+
+`dotter` tasks should be done with or without being attended do. This makes it suitable for use in other scripts or automatic deployment of computing instances. The need for superuser privileges should not be required as most use cases of "dotfiles" stay within a user's home directory. 
