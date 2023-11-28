@@ -27,9 +27,15 @@ These are shell commands that need to be executed after the link or copies being
 
 ### Prune modes
 
+Prune modes are directly dependent on the link mode used during activation. In most cases, it is fine not to specify this as all that is required in deletion of a symlink or file/directory.
+
 ### Pre-cleanup commands
 
+These are shell commands that need to be executed before the links or copies are removed to deactivate a configuration. A likely scenario is removing the private keys of an active ssh configuration. This can (and should) be done before the configuration is deactivate to control what happens with them. Doing this prevents that identity file from being at the whim of the next configuration or the error-prone user.
+
 ### Post cleanup commands
+
+These are shell commands that need to be executed after the links or copies are removed to deactivate a configuration. A likely scenario is removing a cache that is created by a program or application. For instance, a vim user might use external plugins to enhance their experience. As a result, plugin data may be cached in `~/.vim`. Deactivating the vim configuration would render this cache invalid and should be removed to prevent conflicts or errors with future uses of vim or alternate vim configurations.
 
 ## System initialization
 
