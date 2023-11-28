@@ -6,9 +6,20 @@
 
 ### Link modes
 
+`dotter` shall provide two different linking modes to activate a named configuration.
+
+1) Link: create symlinks between the required location and the actual configuration location.
+2) Copy: create copies of the actual configuration and place the copied configuration in the required location
+
+The linking mode used during activation will determine how the configuration will be pruned. The locations to be used during the process will be specified in `dotter`'s own configuration on a per-configuration basis. If a configuration required more than 1 artifact to be linked or copied, that can be specified as well.
+
 ### Pre-install commands
 
+These are shell commands that need to be executed prior to the link or copies being placed to activate a configuration. A likely scenario of this is specifying the existence of a required directory, such as `~/.config/nvim` for neovim. When activating a neovim configuration, `dotter` will ensure the configuration directory used by neovim exists. If it does not, `dotter` shall create it automatically before performing the link stage for neovim.
+
 ### Post install commands
+
+These are shell commands that need to be executed after the link or copies being placed to activate a configuration. A likely scenario of this is running setup commands for the named configuration. For example, activating a configuration for bash would require you to run `source ~/.bashrc` in order to see the new configuration take affect.
 
 ## Pruning
 
