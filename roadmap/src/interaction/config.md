@@ -33,11 +33,14 @@ A configuration represents a application's necessary configuration files that ne
 
 | Package information | Description | Allowed Values | Default |
 | ------------------- | ----------- | -------------- | ------- |
-| `config_name` | A user assigned name for the configuration separate from its given configuration identifier | Strings (any) | Modified version of the configuration identifier |
+| `name` | A user assigned name for the configuration separate from its given configuration identifier | Strings (any) | None (Optional) |
+| `description` | A user description for the configuration | Strings (any) | None (Optional) |
 | `status` | A statement of preparedness for this configuration | String: `["stable", "deprecated", "testing"]` | `"stable"` |
 | `repository` | Absolute path to the location of the configuration repository on disk | String (path-like) | None, required field |
 
-The linkage information works on a per-path basis. Multiple links can be part of a single configuration. In effect, the value of the `links` key is a list of the following key-value mappings
+Linkage information is provided in the `on` table of a named configuration. Keys in this table are the system names for which the configuration is supported on. To better understand the structure, the configuration for a system can read as `{config} -> on -> {system}`. The value of this chained key specifies how to setup the configuration on *only* the named system. Absence of a system's name as a key indicates that the configuration is not supported on that system. 
+
+The individual links are laid out on the `links` table under a specific system. This allows the link and prune process to be specified for particular system and specialized for configurations that offer cross platform support.
 
 | Link information | Description | Allowed Values | Default |
 | ---------------- | ----------- | -------------- | ------- |
@@ -45,14 +48,14 @@ The linkage information works on a per-path basis. Multiple links can be part of
 | `target` | Path to the configuration file's desired location | String (path-like) | None, field is required |
 | `mode` | How to create the connection between `source` and `target` | Strings: `["link", "copy"]` | `link` |
 
-The hooks section contains any pre-link and post link commands to run. It also hosts the pre-prune and post prune commands to run. The link hooks and prune hooks are separate keys in this section whose values are mappings as described in the following table. This section is optional and in its absence, no action is taken before or after linking or pruning.
+The hooks section contains any pre-link and post link commands to run. It also hosts the pre-prune and post prune commands to run. The link hooks and prune hooks are separate keys in this section whose values are mappings as described in the following table. This section is optional and in its absence, no action is taken before or after linking or pruning. At this time, only the `run` directive is supported, which can specify shell commands to run as a subprocess of `dotter` at their respective steps on the link or prune process. Other directive support may become available later on.
 
 | Hook information | Description | Allowed Values |
 | ---------------- | ----------- | -------------- |
-| `pre_setup` | Commands to run before setting up a configuration | Strings that are shell commands |
-| `post_setup` | Commands to run after setting up a configuration | Strings that are shell commands |
-| `pre_teardown` | Commands to run before deactivating a configuration | Strings that are shell commands |
-| `post_teardown` | Commands to run after deactivating a configuration | Strings that are shell commands |
+| `preinstall` | Commands to run before setting up a configuration | Strings that are shell commands |
+| `postinstall` | Commands to run after setting up a configuration | Strings that are shell commands |
+| `preremove` | Commands to run before deactivating a configuration | Strings that are shell commands |
+| `postremove` | Commands to run after deactivating a configuration | Strings that are shell commands |
 
 ## Example configurations
 
