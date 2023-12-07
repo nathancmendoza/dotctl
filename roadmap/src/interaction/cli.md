@@ -15,6 +15,12 @@
 
 ### `use`
 
+This is the verb used to initialize `dotter` It expects a single argument, which is the path to the configuration file that should be used. `dotter` shall validate that the configuration is valid and should fail to complete setup if not. The configuration file is **copied** to a predictable location (TBD soon). If changes are made to the original configuration, the `use` verb must be used again to update the configuration that is currently in use. 
+
+| Option | Description |
+|:------:| ----------- |
+| `--link-config` | Force a symlink to be created to the `dotter` configuration file instead of copying it |
+
 ### `install`
 
 This is the verb used to specify that `dotter` should install a named configuration. It expects a single argument, which is the named configuration to install. 
