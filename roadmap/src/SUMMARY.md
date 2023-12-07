@@ -15,5 +15,9 @@
 
 # Architecture
 
+- [Logic](./architecture/logic.md)
+- [Models](./architecture/models.md)
+- [Artifacts](./architecture/artifacts.md)
+
 # Implementation
 
