@@ -27,6 +27,44 @@ pub mod links {
     }
 }
 
+pub mod hooks {
+
+    use std::vec::Vec;
+    use std::process::Command;
+
+    #[derive(Debug, PartialEq, Eq)]
+    pub enum HookTime {
+        Preinstall,
+        Postinstall,
+        Preremove,
+        Postremove
+    }
+
+    pub struct HookProcess {
+        commands: Vec<String>,
+        runtime: HookTime
+    }
+
+    impl HookProcess {
+        pub fn new(cmds: Vec<String>, when: HookTime) -> Self {
+            HookProcess {
+                commands: cmds,
+                runtime: when
+            }
+        }
+
+        pub fn run(&self) {
+            for cmd in self.commands.iter() {
+                self.exec(&cmd);
+            }
+        }
+
+        fn exec(&self, command: &String) {
+            unimplemented!()
+        }
+    }
+}
+
 
 #[cfg(test)]
 mod links_test {
