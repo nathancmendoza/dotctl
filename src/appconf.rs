@@ -1,7 +1,9 @@
 // Data structures and functions that help dotter manage user application configurations
 
 pub mod links {
-    use std::path::PathBuf;
+    extern crate dirs;
+    use std::path::{PathBuf};
+
 
     #[derive(Debug, PartialEq, Eq)]
     pub enum LinkMode {
@@ -17,20 +19,54 @@ pub mod links {
     }
 
     impl LinkSpec {
-        pub fn new(source_path: PathBuf, target_path: PathBuf, mode: LinkMode) -> Self {
+        pub fn new<P: AsRef<PathBuf>>(source_path: P, target_path: P, mode: LinkMode) -> Self {
             LinkSpec {
-                source: source_path,
-                target: target_path,
+                source: source_path.as_ref().to_path_buf(),
+                target: target_path.as_ref().to_path_buf(),
                 link_mode: mode
             }
         }
+
+        pub fn source<R: AsRef<PathBuf>>(&self, root: Option<R>) -> Result<PathBuf, &str> {
+            if self.source.is_absolute() {
+                return Ok(self.source.clone())
+            }
+            if self.source.is_relative() {
+                let _ = match root {
+                    Some(p) => Ok::<PathBuf, &str>(self.resolve_path_with_root(p)),
+                    None => Ok(self.expanduser_on_source())
+                };
+            }
+            Err("Failed to resolve link source path")
+        }
+
+        pub fn target(&self) -> Result<PathBuf, &str> {
+            unimplemented!()
+        }
+
+        fn resolve_path_with_root<R: AsRef<PathBuf>>(&self, root: R) -> PathBuf {
+            root.as_ref().to_path_buf().join(self.source.clone())
+        }
+
+        fn expanduser_on_source(&self) -> PathBuf {
+            const HOME_PREFIX: &str = "~";
+            if self.source.starts_with(HOME_PREFIX) {
+                let suffix = self.source.strip_prefix(HOME_PREFIX).unwrap();
+                match dirs::home_dir() {
+                    Some(h) => h.join(suffix),
+                    None => PathBuf::from("/").join(suffix)
+                };
+            }
+            self.source.clone()
+        }
+
     }
 }
 
 pub mod hooks {
 
     use std::vec::Vec;
-    use std::process::Command;
+    //use std::process::Command;
 
     #[derive(Debug, PartialEq, Eq)]
     pub enum HookTime {
