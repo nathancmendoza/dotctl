@@ -4,6 +4,7 @@ pub mod links {
     extern crate dirs;
     use std::path::{PathBuf, Path};
 
+    const HOME_PREFIX: &str = "~";
 
     #[derive(Debug, PartialEq, Eq)]
     pub enum LinkMode {
@@ -25,6 +26,18 @@ pub mod links {
                 target: target_path.as_ref().to_path_buf(),
                 link_mode: mode
             }
+        }
+
+        pub fn get_canonical_source(&self) -> Result<PathBuf, &str> {
+            unimplemented!()
+        }
+
+        pub fn get_canonical_target(&self) -> Result<PathBuf, &str> {
+            unimplemented!()
+        }
+
+        pub fn get_link_strategy(&self) -> &LinkMode {
+            &self.link_mode
         }
 
     }
@@ -106,7 +119,19 @@ mod links_test {
         let spec2 = LinkSpec::new(t, s, LinkMode::Link);
 
         assert_ne!(spec1, spec2);
-
     }
 
+    #[test]
+    fn link_spec_stratgety_retrieval() {
+        let s = "an/app.conf";
+        let t = "~/app/config";
+
+        let spec1 = LinkSpec::new(s, t, LinkMode::Link);
+        let spec2 = LinkSpec::new(s, t, LinkMode::Copy);
+
+        assert_eq!(spec1.get_link_strategy(), &LinkMode::Link);
+        assert_eq!(spec2.get_link_strategy(), &LinkMode::Copy);
+        assert_ne!(spec1.get_link_strategy(), spec2.get_link_strategy());
+
+    }
 }
