@@ -2,7 +2,7 @@
 
 pub mod links {
     extern crate dirs;
-    use std::path::{PathBuf};
+    use std::path::{PathBuf, Path};
 
 
     #[derive(Debug, PartialEq, Eq)]
@@ -19,7 +19,7 @@ pub mod links {
     }
 
     impl LinkSpec {
-        pub fn new<P: AsRef<PathBuf>>(source_path: P, target_path: P, mode: LinkMode) -> Self {
+        pub fn new<P: AsRef<Path>>(source_path: P, target_path: P, mode: LinkMode) -> Self {
             LinkSpec {
                 source: source_path.as_ref().to_path_buf(),
                 target: target_path.as_ref().to_path_buf(),
@@ -27,7 +27,7 @@ pub mod links {
             }
         }
 
-        pub fn source<R: AsRef<PathBuf>>(&self, root: Option<R>) -> Result<PathBuf, &str> {
+        pub fn source<R: AsRef<Path>>(&self, root: Option<R>) -> Result<PathBuf, &str> {
             if self.source.is_absolute() {
                 return Ok(self.source.clone())
             }
@@ -44,7 +44,7 @@ pub mod links {
             unimplemented!()
         }
 
-        fn resolve_path_with_root<R: AsRef<PathBuf>>(&self, root: R) -> PathBuf {
+        fn resolve_path_with_root<R: AsRef<Path>>(&self, root: R) -> PathBuf {
             root.as_ref().to_path_buf().join(self.source.clone())
         }
 
@@ -105,29 +105,28 @@ pub mod hooks {
 #[cfg(test)]
 mod links_test {
 
-    use std::path::Path;
     use crate::links::{LinkSpec, LinkMode};
 
     #[test]
     fn link_spec_from_path() {
-        let s = Path::new("an/app.conf").to_path_buf();
-        let t = Path::new("~/app/config").to_path_buf();
+        let s = "an/app.conf";
+        let t = "~/app/config";
 
 
-        let spec1 = LinkSpec::new(s.clone(), t.clone(), LinkMode::Link);
-        let spec2 = LinkSpec::new(s.clone(), t.clone(), LinkMode::Link);
+        let spec1 = LinkSpec::new(s, t, LinkMode::Link);
+        let spec2 = LinkSpec::new(s, t, LinkMode::Link);
 
         assert_eq!(spec1, spec2);
     }
 
     #[test]
     fn link_spec_differs_by_mode() {
-        let s = Path::new("an/app.conf").to_path_buf();
-        let t = Path::new("~/app/config").to_path_buf();
+        let s = "an/app.conf";
+        let t = "~/app/config";
 
 
-        let spec1 = LinkSpec::new(s.clone(), t.clone(), LinkMode::Link);
-        let spec2 = LinkSpec::new(s.clone(), t.clone(), LinkMode::Copy);
+        let spec1 = LinkSpec::new(s, t, LinkMode::Link);
+        let spec2 = LinkSpec::new(s, t, LinkMode::Copy);
 
         assert_ne!(spec1, spec2);
     }
