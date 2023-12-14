@@ -27,39 +27,6 @@ pub mod links {
             }
         }
 
-        pub fn source<R: AsRef<Path>>(&self, root: Option<R>) -> Result<PathBuf, &str> {
-            if self.source.is_absolute() {
-                return Ok(self.source.clone())
-            }
-            if self.source.is_relative() {
-                let _ = match root {
-                    Some(p) => Ok::<PathBuf, &str>(self.resolve_path_with_root(p)),
-                    None => Ok(self.expanduser_on_source())
-                };
-            }
-            Err("Failed to resolve link source path")
-        }
-
-        pub fn target(&self) -> Result<PathBuf, &str> {
-            unimplemented!()
-        }
-
-        fn resolve_path_with_root<R: AsRef<Path>>(&self, root: R) -> PathBuf {
-            root.as_ref().to_path_buf().join(self.source.clone())
-        }
-
-        fn expanduser_on_source(&self) -> PathBuf {
-            const HOME_PREFIX: &str = "~";
-            if self.source.starts_with(HOME_PREFIX) {
-                let suffix = self.source.strip_prefix(HOME_PREFIX).unwrap();
-                match dirs::home_dir() {
-                    Some(h) => h.join(suffix),
-                    None => PathBuf::from("/").join(suffix)
-                };
-            }
-            self.source.clone()
-        }
-
     }
 }
 
@@ -124,10 +91,22 @@ mod links_test {
         let s = "an/app.conf";
         let t = "~/app/config";
 
-
         let spec1 = LinkSpec::new(s, t, LinkMode::Link);
         let spec2 = LinkSpec::new(s, t, LinkMode::Copy);
 
         assert_ne!(spec1, spec2);
     }
+
+    #[test]
+    fn link_spec_differs_by_paths() {
+        let s = "an/app.conf";
+        let t = "~/app/config";
+
+        let spec1 = LinkSpec::new(s, t, LinkMode::Link);
+        let spec2 = LinkSpec::new(t, s, LinkMode::Link);
+
+        assert_ne!(spec1, spec2);
+
+    }
+
 }
