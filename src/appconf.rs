@@ -3,8 +3,28 @@
 pub mod links {
     extern crate dirs;
     use std::path::{PathBuf, Path};
+    use std::error::Error;
+    use std::fmt;
 
-    pub const HOME_PREFIX: &str = "~";
+    use dirs::home_dir;
+
+    pub const HOME_PREFIX: &str = "~/";
+
+    fn expand_user<P: AsRef<Path>>(path: P) -> Result<PathBuf, LinkResolutionError> {
+        match path.as_ref().to_path_buf().strip_prefix(HOME_PREFIX) {
+            Ok(p) => {
+                match home_dir() {
+                    Some(home) => Ok(home.to_path_buf().join(p)),
+                    None => Err(LinkResolutionError::NoHomeDirectoryFound)
+                }
+            },
+            Err(_) => Err(LinkResolutionError::NoHomeDirectoryToResolve)
+        }
+    }
+
+    fn expand_with_parent<P: AsRef<Path>>(parent: P, path: &PathBuf) -> PathBuf {
+        parent.as_ref().to_path_buf().join(path).to_path_buf()
+    }
 
     #[derive(Debug, PartialEq, Eq)]
     pub enum LinkMode {
@@ -19,6 +39,25 @@ pub mod links {
         link_mode: LinkMode
     }
 
+    #[derive(Debug, Clone)]
+    pub enum LinkResolutionError {
+        NoHomeDirectoryFound,
+        NoHomeDirectoryToResolve,
+        NoParentToResolveRelativePath
+    }
+
+    impl fmt::Display for LinkResolutionError {
+        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+            match self {
+                LinkResolutionError::NoHomeDirectoryFound => write!(f, "The `~` symbol could not be resolved to a path"),
+                LinkResolutionError::NoHomeDirectoryToResolve => write!(f, "Expected to resolve `~` prefix but was not found"),
+                LinkResolutionError::NoParentToResolveRelativePath => write!(f, "Cannot resolve relative path without a parent")
+            }
+        }
+    }
+
+    impl Error for LinkResolutionError {}
+
     impl LinkSpec {
         pub fn new<P: AsRef<Path>>(source_path: P, target_path: P, mode: LinkMode) -> Self {
             LinkSpec {
@@ -28,8 +67,26 @@ pub mod links {
             }
         }
         
-        pub fn get_canonical_source<P: AsRef<Path>>(&self, parent: Option<P>) -> Result<PathBuf, &str> {
-            unimplemented!()
+        pub fn get_canonical_source<P: AsRef<Path>>(&self, parent: Option<P>) -> Result<PathBuf, LinkResolutionError> {
+            if self.source.is_absolute() {
+                return Ok(expand_with_parent("/", &self.source));
+            }
+
+            if self.source.starts_with(HOME_PREFIX) {
+                match self.source.strip_prefix(HOME_PREFIX) {
+                    Ok(p) => match home_dir() {
+                        Some(h) => Ok(h.as_path().join(p)),
+                        None => Err(LinkResolutionError::NoHomeDirectoryFound)
+                    },
+                    Err(_) => Err(LinkResolutionError::NoHomeDirectoryToResolve)
+                }
+            }
+            else {
+                match parent {
+                    Some(root) => Ok(root.as_ref().to_path_buf().join(&self.source)),
+                    None => Err(LinkResolutionError::NoParentToResolveRelativePath)
+                }
+            } 
         }
 
         pub fn get_canonical_target(&self) -> Result<PathBuf, &str> {
@@ -110,8 +167,7 @@ mod links_test {
             Err(_) => panic!("Souce path not retrieved")
         };
 
-        expected.join(s.strip_prefix(HOME_PREFIX).unwrap());
-        assert_eq!(expected.as_os_str(), true_source.as_os_str());
+        assert_eq!(expected.join(s.strip_prefix(HOME_PREFIX).unwrap()).as_os_str(), true_source.as_os_str());
     }
 
     #[test]
