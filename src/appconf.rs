@@ -73,17 +73,16 @@ pub mod links {
             }
 
             if self.source.starts_with(HOME_PREFIX) {
-                match self.source.strip_prefix(HOME_PREFIX) {
-                    Ok(p) => match home_dir() {
-                        Some(h) => Ok(h.as_path().join(p)),
-                        None => Err(LinkResolutionError::NoHomeDirectoryFound)
-                    },
-                    Err(_) => Err(LinkResolutionError::NoHomeDirectoryToResolve)
-                }
+                return expand_user(&self.source);
             }
             else {
                 match parent {
-                    Some(root) => Ok(root.as_ref().to_path_buf().join(&self.source)),
+                    Some(root) => {
+                        if root.as_ref().starts_with(HOME_PREFIX) {
+                            return expand_user(expand_with_parent(root, &self.source))
+                        }
+                        Ok(expand_with_parent(root, &self.source))
+                    },
                     None => Err(LinkResolutionError::NoParentToResolveRelativePath)
                 }
             } 
