@@ -73,7 +73,7 @@ pub mod links {
             }
 
             if self.source.starts_with(HOME_PREFIX) {
-                return expand_user(&self.source);
+                expand_user(&self.source)
             }
             else {
                 match parent {
@@ -214,7 +214,6 @@ mod links_test {
         };
 
         let expected = dirs::home_dir().unwrap();
-        
 
         assert_eq!(expected.join(p.strip_prefix(HOME_PREFIX).unwrap()).join(s).as_os_str(), true_source.as_os_str());
 
