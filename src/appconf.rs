@@ -218,4 +218,33 @@ mod links_test {
         assert_eq!(expected.join(p.strip_prefix(HOME_PREFIX).unwrap()).join(s).as_os_str(), true_source.as_os_str());
 
     }
+
+    #[test]
+    fn resolve_target_with_tilde() {
+        let s = "~/an/app.conf";
+        let t = "~/an/app/config";
+        let expected = dirs::home_dir().unwrap();
+        let spec = LinkSpec::new(s, t, LinkMode::Link);
+
+        let true_target = match spec.get_canonical_target() {
+            Ok(path) => path,
+            Err(_) => panic!("Target path not retrieved")
+        };
+
+        assert_eq!(expected.join(t.strip_prefix(HOME_PREFIX).unwrap()).as_os_str(), true_target.as_os_str());
+    }
+
+    #[test]
+    fn resolve_target_that_is_absolute() {
+        let s = "~/an/app.conf";
+        let t = "/etc/an/app/config";
+        let spec = LinkSpec::new(s, t, LinkMode::Link);
+
+        let true_target = match spec.get_canonical_target() {
+            Ok(path) => path,
+            Err(_) => panic!("Target path not retrieved")
+        };
+
+        assert_eq!(t, true_target.as_os_str());
+    }
 }
