@@ -90,7 +90,7 @@ pub mod links {
 
         pub fn get_canonical_target(&self) -> Result<PathBuf, LinkResolutionError> {
             if self.target.is_absolute() {
-                return Ok(expand_with_parent("/", &self.target));
+                Ok(expand_with_parent("/", &self.target))
             }
             else if self.target.starts_with(HOME_PREFIX) {
                 expand_user(&self.target)
