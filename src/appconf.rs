@@ -8,24 +8,6 @@ pub mod links {
 
     use dirs::home_dir;
 
-    pub const HOME_PREFIX: &str = "~/";
-
-//    fn expand_user<P: AsRef<Path>>(path: P) -> Result<PathBuf, LinkResolutionError> {
-//        match path.as_ref().to_path_buf().strip_prefix(HOME_PREFIX) {
-//            Ok(p) => {
-//                match home_dir() {
-//                    Some(home) => Ok(home.to_path_buf().join(p)),
-//                    None => Err(LinkResolutionError::NoHomeDirectoryFound)
-//                }
-//            },
-//            Err(_) => Err(LinkResolutionError::NoHomeDirectoryToResolve)
-//        }
-//    }
-
-//    fn expand_with_parent<P: AsRef<Path>>(parent: P, path: &PathBuf) -> PathBuf {
-//        parent.as_ref().to_path_buf().join(path).to_path_buf()
-//    }
-
     trait LinkResolver {
 
         fn resolve<P: AsRef<Path>>(&self, to_resolve: P) -> Result<PathBuf, LinkResolutionError>;
@@ -49,8 +31,7 @@ pub mod links {
     #[derive(Debug, Clone)]
     pub enum LinkResolutionError {
         NoHomeDirectoryFound,
-        NoHomeDirectoryToResolve,
-        NoParentToResolveRelativePath
+        NoHomeDirectoryToResolve
     }
 
     struct ResolveWithHomeDirectory<'a> {
@@ -129,8 +110,7 @@ pub mod links {
         fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
             match self {
                 LinkResolutionError::NoHomeDirectoryFound => write!(f, "The `~` symbol could not be resolved to a path"),
-                LinkResolutionError::NoHomeDirectoryToResolve => write!(f, "Expected to resolve `~` prefix but was not found"),
-                LinkResolutionError::NoParentToResolveRelativePath => write!(f, "Cannot resolve relative path without a parent")
+                LinkResolutionError::NoHomeDirectoryToResolve => write!(f, "Expected to resolve `~` prefix but was not found")
             }
         }
     }
@@ -157,6 +137,10 @@ pub mod links {
 
         pub fn get_link_strategy(&self) -> &LinkMode {
             &self.link_mode
+        }
+
+        fn resolve_link_path(&self, to_resolve: P) -> Result<PathBuf, LinkResolutionError> {
+            
         }
 
     }
