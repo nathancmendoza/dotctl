@@ -259,6 +259,19 @@ mod links_test {
     }
 
     #[test]
+    fn test_source_resolution_with_parent_that_introduces_tilde() {
+        let s = "appconfs/app.conf";
+        let t = "";
+        let home = home_dir().unwrap();
+
+        let spec = LinkSpec::new(s, t, LinkMode::Link);
+        let res = spec.get_resolved_source(Some("~/.config"));
+
+        assert!(res.is_ok());
+        assert!(res.unwrap().starts_with(home));
+    }
+
+    #[test]
     fn test_source_resolution_without_parent_fails() {
         let s = "appconfs/app.conf";
         let t = "";
