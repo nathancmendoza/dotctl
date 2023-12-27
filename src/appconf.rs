@@ -164,6 +164,10 @@ pub mod links {
                 return Some(LinkResolutionIssue::HasTilde);
             }
 
+            if to_resolve.is_relative() {
+                return Some(LinkResolutionIssue::IsRelative);
+            }
+
             None
         }
     }
@@ -292,6 +296,17 @@ mod links_test {
 
         assert!(res.is_ok());
         assert_eq!(s, res.unwrap().as_os_str());
+    }
+
+    #[test]
+    fn test_target_resolution_of_relative_path_fails() {
+        let s = "appconfs/app.conf";
+        let t = "";
+
+        let spec = LinkSpec::new(t, s, LinkMode::Copy);
+        let res = spec.get_resolved_target();
+
+        assert!(res.is_err());
     }
 
     #[test]
