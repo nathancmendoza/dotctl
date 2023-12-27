@@ -57,25 +57,6 @@ pub mod links {
         parent: &'a Option<D>
     }
 
-//    struct ResolveWithRootDirectory{}
-//
-//    impl ResolveWithRootDirectory {
-//        pub fn new() -> Self {
-//            ResolveWithRootDirectory{}
-//        }
-//    }
-//
-//    impl LinkResolver for ResolveWithRootDirectory {
-//        fn resolve<P: AsRef<Path>>(&self, to_resolve: P) -> Result<PathBuf, LinkResolutionError> {
-//            Ok(to_resolve.as_ref().to_path_buf())
-//        }
-//
-//        fn can_resolve<P: AsRef<Path>>(&self, to_resolve: P) -> bool {
-//            to_resolve.as_ref().to_path_buf().is_absolute()
-//        }
-//
-//    }
-
     impl<'a, D: AsRef<Path>> ResolveWithParentDirectory<'a, D> {
         pub fn new(root: &'a Option<D>) -> Self {
             ResolveWithParentDirectory { parent: root }
@@ -190,5 +171,127 @@ pub mod links {
 
 #[cfg(test)]
 mod links_test {
+    use dirs::home_dir;
 
+    use super::links::{LinkSpec, LinkMode};
+
+    #[test]
+    fn test_link_specs_are_comparable() {
+        let s = "~/appconfs/app.conf";
+        let t = "~/.appconf";
+
+        let spec1 = LinkSpec::new(s, t, LinkMode::Link);
+        let spec2 = LinkSpec::new(s, t, LinkMode::Link);
+
+        assert_eq!(spec1, spec2);
+    }
+
+    #[test]
+    fn test_link_specs_differ_when_paths_do_not_match() {
+        let s = "~/appconfs/app.conf";
+        let t = "~/.appconf";
+
+        let spec1 = LinkSpec::new(s, t, LinkMode::Link);
+        let spec2 = LinkSpec::new(s, s, LinkMode::Link);
+
+        assert_ne!(spec1, spec2);
+    }
+
+    #[test]
+    fn test_link_specs_differ_when_link_modes_do_not_match() {
+        let s = "~/appconfs/app.conf";
+        let t = "~/.appconf";
+
+        let spec1 = LinkSpec::new(s, t, LinkMode::Link);
+        let spec2 = LinkSpec::new(s, t, LinkMode::Copy);
+
+        assert_ne!(spec1, spec2);
+    }
+
+    #[test]
+    fn test_link_mode_is_publicly_visible() {
+        let s = "~/appconfs/app.conf";
+        let t = "~/.appconf";
+
+        let spec1 = LinkSpec::new(s, t, LinkMode::Link);
+        let spec2 = LinkSpec::new(s, t, LinkMode::Copy);
+
+        assert_eq!(spec1.get_link_strategy(), &LinkMode::Link);
+        assert_eq!(spec2.get_link_strategy(), &LinkMode::Copy);
+        assert_ne!(spec1.get_link_strategy(), spec2.get_link_strategy());
+    }
+
+    #[test]
+    fn test_source_resolution_of_absolute_path() {
+        let s = "/etc/app/app.conf";
+        let t = "";
+
+        let spec = LinkSpec::new(s, t, LinkMode::Link);
+        let res = spec.get_resolved_source(None);
+
+        assert!(res.is_ok());
+        assert_eq!(s, res.unwrap().as_os_str());
+    }
+
+    #[test]
+    fn test_source_resolution_with_tilde() {
+        let s = "~/appconfs/app.conf";
+        let t = "";
+        let home = home_dir().unwrap();
+
+        let spec = LinkSpec::new(s, t, LinkMode::Link);
+        let res = spec.get_resolved_source(None);
+
+        assert!(res.is_ok());
+        assert!(res.unwrap().starts_with(home));
+    }
+
+    #[test]
+    fn test_source_resolution_with_parent() {
+        let s = "appconfs/app.conf";
+        let t = "";
+
+        let spec = LinkSpec::new(s, t, LinkMode::Link);
+        let res = spec.get_resolved_source(Some("/var/etc/"));
+
+        assert!(res.is_ok());
+        assert_eq!(res.unwrap().as_os_str(), "/var/etc/appconfs/app.conf");
+    }
+
+    #[test]
+    fn test_source_resolution_without_parent_fails() {
+        let s = "appconfs/app.conf";
+        let t = "";
+
+        let spec = LinkSpec::new(s, t, LinkMode::Copy);
+        let res = spec.get_resolved_source(None);
+
+        assert!(res.is_err());
+    }
+
+    #[test]
+    fn test_target_resolution_of_absolute_path() {
+        let s = "/etc/app/app.conf";
+        let t = "";
+
+        let spec = LinkSpec::new(t, s, LinkMode::Link);
+        let res = spec.get_resolved_target();
+
+        assert!(res.is_ok());
+        assert_eq!(s, res.unwrap().as_os_str());
+    }
+
+    #[test]
+    fn test_target_resolution_with_tilde() {
+        let s = "~/appconfs/app.conf";
+        let t = "";
+        let home = home_dir().unwrap();
+
+        let spec = LinkSpec::new(t, s, LinkMode::Link);
+        let res = spec.get_resolved_target();
+
+        assert!(res.is_ok());
+        assert!(res.unwrap().starts_with(home));
+
+    }
 }
