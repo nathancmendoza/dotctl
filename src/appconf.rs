@@ -66,7 +66,7 @@ pub mod links {
     impl<'a, D: AsRef<Path>> LinkResolver for ResolveWithParentDirectory<'a, D> {
         fn resolve<P: AsRef<Path>>(&self, to_resolve: P) -> Result<PathBuf, LinkResolutionError> {
             match &self.parent {
-                Some(p) => Ok(p.as_ref().to_path_buf().join(to_resolve.as_ref().to_path_buf())),
+                Some(p) => Ok(p.as_ref().to_path_buf().join(to_resolve.as_ref())),
                 None => Err(LinkResolutionError::ResolverNotApplicable)
             }
         }
@@ -145,7 +145,7 @@ pub mod links {
             &self.link_mode
         }
 
-        fn find_source_resolutions(&self, to_resolve: &PathBuf) -> Option<LinkResolutionIssue> {
+        fn find_source_resolutions(&self, to_resolve: &Path) -> Option<LinkResolutionIssue> {
             
             if to_resolve.starts_with(HOME_PREFIX) {
                 return Some(LinkResolutionIssue::HasTilde);
@@ -158,7 +158,7 @@ pub mod links {
             None
         }
 
-        fn find_target_resolutions(&self, to_resolve: &PathBuf) -> Option<LinkResolutionIssue> {
+        fn find_target_resolutions(&self, to_resolve: &Path) -> Option<LinkResolutionIssue> {
 
             if to_resolve.starts_with(HOME_PREFIX) {
                 return Some(LinkResolutionIssue::HasTilde);
