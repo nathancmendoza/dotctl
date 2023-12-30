@@ -173,6 +173,78 @@ pub mod links {
     }
 }
 
+mod hooks {
+    use std::{process::Command, ffi::OsStr};
+
+    pub struct HookCommand<S, I>
+    where
+        S: AsRef<OsStr>,
+        I: IntoIterator,
+        I::Item: AsRef<OsStr>
+    {
+        binary: S,
+        arguments: I,
+        stderr: String,
+        stdout: String,
+        when: HookTime,
+        status: HookState
+    }
+
+    #[derive(Debug)]
+    pub enum HookTime {
+        PreSetup,
+        PostSetup,
+        PreTeardown,
+        PostTeardown
+    }
+
+    pub enum HookState {
+        Ready,
+        Running,
+        ExitSuccess,
+        ExitFailure
+    }
+
+    pub struct HookOutput {
+        stderr: String,
+        stdout: String,
+    }
+
+    #[derive(Debug, Clone)]
+    pub enum HookExecutionError {
+        ExitFailure
+    }
+
+    impl<S: AsRef<OsStr>, I: IntoIterator> HookCommand<S, I> 
+    where
+        I::Item: AsRef<OsStr>
+    {
+        pub fn new(bin: S, argv: I, time: HookTime) -> Self {
+            HookCommand {
+                binary: bin,
+                arguments: argv,
+                stderr: String::default(),
+                stdout: String::default(),
+                when: time,
+                status: HookState::Ready
+            }
+        }
+
+        pub fn run(&mut self) -> Result<(), HookExecutionError> {
+            unimplemented!()
+        }
+
+        pub fn exit_status(&self) -> HookState {
+            unimplemented!()
+        }
+
+        pub fn captured_output(&self) -> HookOutput {
+            unimplemented!()
+        }
+    }
+
+}
+
 #[cfg(test)]
 mod links_test {
     use dirs::home_dir;
