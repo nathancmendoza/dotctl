@@ -35,7 +35,7 @@ configurations:
       mode: HARDLINK
   - name: ssh
     status: READY
-    system: linux
+    os: linux
     links:
       - name: config
         source: ssh/config
