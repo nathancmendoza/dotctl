@@ -8,6 +8,27 @@ use std::error::Error;
 use clap::Parser;
 
 use crate::cli::DotterInvocation;
+use crate::config::read_config;
+
+fn use_config() {
+
+}
+
+fn setup_config() {
+
+}
+
+fn teardwon_config() {
+
+}
+
+fn show_config_status() {
+
+}
+
+fn describe_config() {
+
+}
 
 fn main() -> Result<(), Box<dyn Error>> {
     let invoke = DotterInvocation::parse();
@@ -19,6 +40,10 @@ fn main() -> Result<(), Box<dyn Error>> {
         cli::DotterActionWord::Setup { app_conf, dry_run } => {
             println!("Setup {} configuration on {}", app_conf, std::env::consts::OS);
             println!("Work will actually occur: {}", !dry_run);
+            let mut configs = read_config().unwrap();
+            for item in configs.all_configs().filter(| config | *config.assigned_name() == app_conf) {
+                println!("{:?}", item);
+            }
         },
         cli::DotterActionWord::Teardown { app_conf, dry_run } => {
             println!("Teardown {} configuration on{}", app_conf, std::env::consts::OS);
@@ -27,10 +52,11 @@ fn main() -> Result<(), Box<dyn Error>> {
         cli::DotterActionWord::Status { app_conf } => {
             println!("Check the status of {} configuration", app_conf);
         },
-        cli::DotterActionWord::Describe { app_conf, links_only, hooks_only } => {
-            println!("Describing the {} configuration on {}", app_conf, std::env::consts::OS);
-            println!("Listing links only: {}", links_only);
-            println!("Listing hooks only: {}", hooks_only);
+        cli::DotterActionWord::Describe { app_conf  } => {
+            match app_conf {
+                Some(s) => println!("Describing the {} configuration on {}", s, std::env::consts::OS),
+                None => println!("Showing configuration\n{:?}", read_config())
+            }
         }
     }
     Ok(())

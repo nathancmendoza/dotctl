@@ -1,9 +1,11 @@
 
 extern crate serde;
 extern crate serde_yaml;
+extern crate resolve_path;
 
 use serde::{Serialize, Deserialize};
 use serde_yaml::from_reader;
+use resolve_path::PathResolveExt;
 
 use crate::links::LinkSpec;
 use crate::hooks::HookSpec;
@@ -12,7 +14,7 @@ use std::fs::File;
 use std::io::BufReader;
 use std::fmt;
 
-const CONFIG_FILE: &str = "test.yaml";
+const CONFIG_FILE: &str = "~/.dotter";
 
 #[derive(Serialize, Deserialize, PartialEq, Debug)]
 pub struct DotfileConfiguration {
@@ -21,12 +23,12 @@ pub struct DotfileConfiguration {
 }
 
 #[derive(Serialize, Deserialize, PartialEq, Debug)]
-struct DotfileOptions {
+pub struct DotfileOptions {
     repository: String
 }
 
 #[derive(Serialize, Deserialize, PartialEq, Debug)]
-struct ConfigSpec {
+pub struct ConfigSpec {
     name: String,
     system: SystemName,
     status: ConfigStatus,
@@ -66,7 +68,7 @@ impl fmt::Display for ConfigurationError {
 impl std::error::Error for ConfigurationError {}
 
 pub fn read_config() -> Result<DotfileConfiguration, ConfigurationError> {
-    let file = match File::open(CONFIG_FILE) {
+    let file = match File::open(CONFIG_FILE.resolve()) {
         Ok(the_file) => the_file,
         Err(_) => return Err(ConfigurationError::NoConfigurationFound)
     };
@@ -76,5 +78,17 @@ pub fn read_config() -> Result<DotfileConfiguration, ConfigurationError> {
     match from_reader(reader) {
         Ok(conf) => Ok(conf),
         Err(e) => Err(ConfigurationError::ParsingError(e))
+    }
+}
+
+impl DotfileConfiguration {
+    pub fn all_configs(&self) -> impl Iterator<Item = &ConfigSpec> {
+        self.configurations.iter()
+    }
+}
+
+impl ConfigSpec {
+    pub fn assigned_name(&self) -> &String {
+        &self.name
     }
 }

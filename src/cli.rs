@@ -33,13 +33,7 @@ pub enum DotterActionWord {
         app_conf: String
     },
     Describe{
-        app_conf: String,
-
-        #[arg(short, long, default_value_t = false)]
-        links_only: bool,
-
-        #[arg(short, long, default_value_t = false)]
-        hooks_only: bool
+        app_conf: Option<String>,
     }
 }
 
