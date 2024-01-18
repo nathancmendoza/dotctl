@@ -41,7 +41,7 @@ fn main() -> Result<(), Box<dyn Error>> {
             println!("Setup {} configuration on {}", app_conf, std::env::consts::OS);
             println!("Work will actually occur: {}", !dry_run);
             let mut configs = read_config().unwrap();
-            for item in configs.all_configs().filter(| config | *config.assigned_name() == app_conf) {
+            for item in configs.all_configs().filter(| config | *config.assigned_name() == app_conf).filter(| config | config.config_os() == std::env::consts::OS) {
                 println!("{:?}", item);
             }
         },

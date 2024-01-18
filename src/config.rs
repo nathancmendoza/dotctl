@@ -85,4 +85,12 @@ impl ConfigSpec {
     pub fn assigned_name(&self) -> &String {
         &self.name
     }
+
+    pub fn config_os(&self) -> &String {
+        &self.os
+    }
+
+    pub fn config_status(&self) -> &ConfigStatus {
+        &self.status
+    }
 }
