@@ -3,7 +3,7 @@ options:
 configurations:
   - name: bash
     status: READY
-    system: LINUX
+    os: linux
     links:
     - name: init
       source: bash/init.sh
@@ -19,7 +19,7 @@ configurations:
       mode: HARDLINK
   - name: bash
     status: UNUSED
-    system: MACOS
+    os: macos
     links:
     - name: init
       source: bash/init.sh
@@ -33,10 +33,9 @@ configurations:
       source: bash/functions.sh
       target: ~/.functions
       mode: HARDLINK
-      extra: field
   - name: ssh
     status: READY
-    system: LINUX
+    system: linux
     links:
       - name: config
         source: ssh/config

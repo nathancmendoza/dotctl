@@ -30,18 +30,12 @@ pub struct DotfileOptions {
 #[derive(Serialize, Deserialize, PartialEq, Debug)]
 pub struct ConfigSpec {
     name: String,
-    system: SystemName,
+    os: String,
     status: ConfigStatus,
     links: Vec<LinkSpec>,
     hooks: Option<Vec<HookSpec>>
 }
 
-#[derive(Serialize, Deserialize, PartialEq, Debug)]
-enum SystemName {
-    LINUX,
-    MACOS,
-    WINDOWS
-}
 
 #[derive(Serialize, Deserialize, PartialEq, Debug)]
 enum ConfigStatus {
