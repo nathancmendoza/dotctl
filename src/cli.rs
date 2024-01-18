@@ -17,9 +17,29 @@ pub enum DotterActionWord {
         #[arg(short, long, default_value_t = false)]
         link_config: bool
     },
-    Setup,
-    Teardown,
-    Status,
-    Describe
+    Setup{
+        app_conf: String,
+
+        #[arg(short, long, default_value_t = false)]
+        dry_run: bool
+    },
+    Teardown{
+        app_conf: String,
+
+        #[arg(short, long, default_value_t = false)]
+        dry_run: bool
+    },
+    Status{
+        app_conf: String
+    },
+    Describe{
+        app_conf: String,
+
+        #[arg(short, long, default_value_t = false)]
+        links_only: bool,
+
+        #[arg(short, long, default_value_t = false)]
+        hooks_only: bool
+    }
 }
 
