@@ -1,5 +1,6 @@
 
 use clap::{Subcommand, Parser};
+use crate::links::LinkMode;
 
 #[derive(Parser)]
 pub struct DotterInvocation {
@@ -21,7 +22,10 @@ pub enum DotterActionWord {
         app_conf: String,
 
         #[arg(short, long, default_value_t = false)]
-        dry_run: bool
+        dry_run: bool,
+
+        #[arg(short, long)]
+        link_mode: Option<LinkMode>
     },
     Teardown{
         app_conf: String,

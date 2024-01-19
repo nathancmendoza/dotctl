@@ -10,8 +10,10 @@ use resolve_path::PathResolveExt;
 use crate::links::LinkSpec;
 use crate::hooks::HookSpec;
 
+use std::borrow::Cow;
 use std::fs::File;
 use std::io::BufReader;
+use std::path::Path;
 use std::fmt;
 
 const CONFIG_FILE: &str = "~/.dotter";
@@ -38,7 +40,7 @@ pub struct ConfigSpec {
 
 
 #[derive(Serialize, Deserialize, PartialEq, Debug)]
-enum ConfigStatus {
+pub enum ConfigStatus {
     READY,
     UNUSED,
 }
@@ -61,20 +63,6 @@ impl fmt::Display for ConfigurationError {
 
 impl std::error::Error for ConfigurationError {}
 
-pub fn read_config() -> Result<DotfileConfiguration, ConfigurationError> {
-    let file = match File::open(CONFIG_FILE.resolve()) {
-        Ok(the_file) => the_file,
-        Err(_) => return Err(ConfigurationError::NoConfigurationFound)
-    };
-
-    let reader = BufReader::new(file);
-
-    match from_reader(reader) {
-        Ok(conf) => Ok(conf),
-        Err(e) => Err(ConfigurationError::ParsingError(e))
-    }
-}
-
 impl DotfileConfiguration {
     pub fn all_configs(&self) -> impl Iterator<Item = &ConfigSpec> {
         self.configurations.iter()
@@ -92,5 +80,19 @@ impl ConfigSpec {
 
     pub fn config_status(&self) -> &ConfigStatus {
         &self.status
+    }
+}
+
+pub fn read_config() -> Result<DotfileConfiguration, ConfigurationError> {
+    let file = match File::open(CONFIG_FILE.resolve()) {
+        Ok(the_file) => the_file,
+        Err(_) => return Err(ConfigurationError::NoConfigurationFound)
+    };
+
+    let reader = BufReader::new(file);
+
+    match from_reader(reader) {
+        Ok(conf) => Ok(conf),
+        Err(e) => Err(ConfigurationError::ParsingError(e))
     }
 }
