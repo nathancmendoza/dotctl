@@ -37,7 +37,7 @@ fn main() -> Result<(), Box<dyn Error>> {
             println!("Using {} as the config file source", config_path);
             println!("Will copy the file: {}", !link_config);
         },
-        cli::DotterActionWord::Setup { app_conf, dry_run } => {
+        cli::DotterActionWord::Setup { app_conf, dry_run, link_mode } => {
             println!("Setup {} configuration on {}", app_conf, std::env::consts::OS);
             println!("Work will actually occur: {}", !dry_run);
             let mut configs = read_config().unwrap();
