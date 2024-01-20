@@ -26,6 +26,16 @@ pub enum LinkMode {
     Copy
 }
 
+impl LinkSpec {
+    pub fn new(src: &str, dest: &str, mode: LinkMode) -> Self {
+        LinkSpec {
+            source: src.to_string(),
+            target: dest.to_string(),
+            mode: mode
+        }
+    }
+}
+
 impl FromStr for LinkMode {
     type Err = io::Error;
 
@@ -42,8 +52,8 @@ impl FromStr for LinkMode {
     }
 }
 
-pub fn setup_link(link_info: &LinkSpec, link_repo: &str) -> Result<(), io::Error> {
-    let true_source = link_info.source.try_resolve_in(link_repo)?;
+pub fn setup_link<P: AsRef<Path>>(link_info: &LinkSpec, link_repo: P) -> Result<(), io::Error> {
+    let true_source = link_info.source.try_resolve_in(link_repo.as_ref())?;
     let true_target = link_info.target.try_resolve()?;
 
     println!("Linking: {:?} -> {:?}", true_source, true_target);
