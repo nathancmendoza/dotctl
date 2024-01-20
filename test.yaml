@@ -2,7 +2,7 @@ options:
   repository: ~/.dotfiles
 configurations:
   - name: bash
-    status: READY
+    status: Ready
     os: linux
     links:
     - name: init
@@ -18,7 +18,7 @@ configurations:
       target: ~/.functions
       mode: Hard
   - name: bash
-    status: UNUSED
+    status: Unused
     os: macos
     links:
     - name: init
@@ -34,8 +34,8 @@ configurations:
       target: ~/.functions
       mode: Hard
   - name: ssh
-    status: READY
-    os: linux
+    status: Ready
+    os: macos
     links:
       - name: config
         source: ssh/config
@@ -45,3 +45,11 @@ configurations:
       - commands:
         - mkdir -p ~/.ssh
         when: PRESETUP
+  - name: vim
+    status: Unused
+    os: macos
+    links:
+      - name: config
+        source: vim/config.vim
+        target: ~/.vimrc
+        mode: Soft
