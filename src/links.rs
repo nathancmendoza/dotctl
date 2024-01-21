@@ -52,7 +52,7 @@ impl FromStr for LinkMode {
     }
 }
 
-pub fn setup_link<P: AsRef<Path>>(link_info: &LinkSpec, link_repo: P) -> Result<(), io::Error> {
+pub fn setup_link<P: AsRef<Path>>(link_info: &LinkSpec, link_repo: P) -> io::Result<()> {
     // 1. fully resolve target and source paths and verify source exists
     // 2. match against link mode
     //      softlink => create the softlink from target -> source
@@ -75,9 +75,26 @@ pub fn setup_link<P: AsRef<Path>>(link_info: &LinkSpec, link_repo: P) -> Result<
     }
 }
 
-pub fn teardown_link(link_info: &LinkSpec) {
+pub fn teardown_link(link_info: &LinkSpec) -> io::Result<()> {
     // 1. fully resolve target path and verify target exists
     // 2. remove the filesystem object at target
+    let true_target = link_info.target.try_resolve()?;
+
+    println!("Removing: {:?}", true_target);
+
+    if !true_target.exists() {
+        return Err(io::Error::new(io::ErrorKind::NotFound, format!("No such target path: {:?}", true_target)));
+    }
+
+    if true_target.is_symlink() {
+        remove_symlink_auto(true_target)
+    }
+    else if true_target.is_dir() {
+        fs::remove_dir_all(true_target)
+    }
+    else {
+        fs::remove_file(true_target)
+    }
 }
 
 fn make_copy(source: &Path, target: &Path) -> Result<(), io::Error> {
