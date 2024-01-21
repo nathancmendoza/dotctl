@@ -1,0 +1,67 @@
+options:
+  repository: ~/.dotfiles
+configurations:
+  - name: bash
+    status: Ready
+    os: linux
+    links:
+    - name: init
+      source: bash/init.sh
+      target: ~/.bashrc
+      mode: Soft
+    - name: aliases
+      source: bash/aliases.sh
+      target: ~/.aliases
+      mode: Hard
+    - name: functions
+      source: bash/functions.sh
+      target: ~/.functions
+      mode: Hard
+  - name: bash
+    status: Unused
+    os: macos
+    links:
+    - name: init
+      source: bash/init.sh
+      target: ~/.bashrc
+      mode: Soft
+    - name: aliases
+      source: bash/aliases.sh
+      target: ~/.aliases
+      mode: Hard
+    - name: functions
+      source: bash/functions.sh
+      target: ~/.functions
+      mode: Hard
+  - name: ssh
+    status: Ready
+    os: macos
+    links:
+      - name: config
+        source: ssh/config
+        target: ~/.ssh/config
+        mode: Copy
+    hooks:
+      - commands:
+        - mkdir -p ~/.ssh
+        when: PRESETUP
+  - name: vim
+    status: Unused
+    os: macos
+    links:
+      - name: config
+        source: vim/config.vim
+        target: ~/.vimrc
+        mode: Soft
+  - name: nvim
+    status: Ready
+    os: macos
+    links:
+      - name: init
+        source: nvim/init.lua
+        target: ~/.config/nvim/init.lua
+        mode: Copy
+      - name: lua dir
+        source: nvim/lua/
+        target: ~/.config/nvim/lua/
+        mode: Copy
