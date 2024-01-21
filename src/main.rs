@@ -48,19 +48,16 @@ fn teardown_config(app_conf: &str) -> io::Result<()> {
 fn main() -> Result<(), Box<dyn Error>> {
     let invoke = DotterInvocation::parse();
     match invoke.action {
-        cli::DotterActionWord::Use { config_path, link_config } => {
+        cli::DotterActionWord::Use { config_path } => {
             println!("Using {} as the config file source", config_path);
-            println!("Will copy the file: {}", !link_config);
             use_config(&config_path)?;
         },
-        cli::DotterActionWord::Setup { app_conf, dry_run, link_mode } => {
+        cli::DotterActionWord::Setup { app_conf } => {
             println!("Setup {} configuration on {}", app_conf, std::env::consts::OS);
-            println!("Work will actually occur: {}", !dry_run);
             setup_config(&app_conf)?;
         },
-        cli::DotterActionWord::Teardown { app_conf, dry_run } => {
+        cli::DotterActionWord::Teardown { app_conf } => {
             println!("Teardown {} configuration on{}", app_conf, std::env::consts::OS);
-            println!("Work will actually occur: {}", !dry_run);
             teardown_config(&app_conf)?;
         }
    }
