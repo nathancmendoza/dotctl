@@ -45,14 +45,6 @@ fn teardown_config(app_conf: &str) -> io::Result<()> {
     Ok(())
 }
 
-fn show_config_status() {
-
-}
-
-fn describe_config() {
-
-}
-
 fn main() -> Result<(), Box<dyn Error>> {
     let invoke = DotterInvocation::parse();
     match invoke.action {
@@ -70,16 +62,7 @@ fn main() -> Result<(), Box<dyn Error>> {
             println!("Teardown {} configuration on{}", app_conf, std::env::consts::OS);
             println!("Work will actually occur: {}", !dry_run);
             teardown_config(&app_conf)?;
-        },
-        cli::DotterActionWord::Status { app_conf } => {
-            println!("Check the status of {} configuration", app_conf);
-        },
-        cli::DotterActionWord::Describe { app_conf  } => {
-            match app_conf {
-                Some(s) => println!("Describing the {} configuration on {}", s, std::env::consts::OS),
-                None => println!("Showing configuration\n{:?}", read_config())
-            }
         }
-    }
+   }
     Ok(())
 }

@@ -33,11 +33,5 @@ pub enum DotterActionWord {
         #[arg(short, long, default_value_t = false)]
         dry_run: bool
     },
-    Status{
-        app_conf: String
-    },
-    Describe{
-        app_conf: Option<String>,
-    }
 }
 

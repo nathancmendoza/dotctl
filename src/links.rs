@@ -101,7 +101,7 @@ fn make_copy(source: &Path, target: &Path) -> Result<(), io::Error> {
     if source.is_file() {
         match fs::copy(source, target) {
             Ok(_) => Ok(()),
-            Err(e) => Err(io::Error::new(io::ErrorKind::Interrupted, format!("Did not copy {:?} -> {:?} completely", source, target)))
+            Err(_) => Err(io::Error::new(io::ErrorKind::Interrupted, format!("Did not copy {:?} -> {:?} completely", source, target)))
         }
     }
     else {
