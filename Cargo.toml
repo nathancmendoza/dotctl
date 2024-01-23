@@ -3,6 +3,8 @@ name = "dotctl"
 version = "0.1.0"
 edition = "2021"
 authors = ["Nathan Mendoza <nathancm@uci.edu>"]
+description = "A CLI tool for managing dotfile setups and removals"
+license = "GPLv3"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
