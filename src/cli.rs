@@ -1,17 +1,16 @@
 
 use clap::{Subcommand, Parser};
-use crate::links::LinkMode;
 
 #[derive(Parser)]
-pub struct DotterInvocation {
+pub struct DotctlInvocation {
 
     #[command(subcommand)]
-    pub action: DotterActionWord,
+    pub action: DotctlActionWord,
 
 }
 
 #[derive(Subcommand)]
-pub enum DotterActionWord {
+pub enum DotctlActionWord {
     Use{
         config_path: String,
     },

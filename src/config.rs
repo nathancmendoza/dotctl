@@ -14,7 +14,7 @@ use std::fs::File;
 use std::io::{self, BufReader};
 use std::str::FromStr;
 
-pub const CONFIG_FILE: &str = "~/.dotter";
+pub const CONFIG_FILE: &str = "~/.dotctl";
 
 #[derive(Serialize, Deserialize, PartialEq, Debug)]
 pub struct DotfileConfiguration {

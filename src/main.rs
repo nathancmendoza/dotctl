@@ -14,7 +14,7 @@ use std::io;
 
 use clap::Parser;
 
-use crate::cli::DotterInvocation;
+use crate::cli::DotctlInvocation;
 use crate::config::{read_config, CONFIG_FILE};
 use crate::links::{setup_link, LinkSpec, LinkMode, teardown_link};
 
@@ -46,17 +46,17 @@ fn teardown_config(app_conf: &str) -> io::Result<()> {
 }
 
 fn main() -> Result<(), Box<dyn Error>> {
-    let invoke = DotterInvocation::parse();
+    let invoke = DotctlInvocation::parse();
     match invoke.action {
-        cli::DotterActionWord::Use { config_path } => {
+        cli::DotctlActionWord::Use { config_path } => {
             println!("Using {} as the config file source", config_path);
             use_config(&config_path)?;
         },
-        cli::DotterActionWord::Setup { app_conf } => {
+        cli::DotctlActionWord::Setup { app_conf } => {
             println!("Setup {} configuration on {}", app_conf, std::env::consts::OS);
             setup_config(&app_conf)?;
         },
-        cli::DotterActionWord::Teardown { app_conf } => {
+        cli::DotctlActionWord::Teardown { app_conf } => {
             println!("Teardown {} configuration on{}", app_conf, std::env::consts::OS);
             teardown_config(&app_conf)?;
         }
