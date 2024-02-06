@@ -7,12 +7,9 @@ use serde::{Serialize, Deserialize};
 use serde_yaml::from_reader;
 use resolve_path::PathResolveExt;
 
-use crate::links::LinkSpec;
-use crate::hooks::HookSpec;
 
 use std::fs::File;
 use std::io::{self, BufReader};
-use std::iter;
 use std::str::FromStr;
 
 pub const CONFIG_FILE: &str = "~/.dotctl";
@@ -44,6 +41,67 @@ pub enum ConfigStatus {
     Unused,
 }
 
+#[derive(Serialize, Deserialize, PartialEq, Debug)]
+pub struct HookSpec {
+    commands: Vec<String>,
+    when: HookExecutionTime
+}
+
+#[derive(Serialize, Deserialize, PartialEq, Debug)]
+pub enum HookExecutionTime {
+    Presetup,
+    Postsetup,
+    Preteardown,
+    Postteardown
+}
+
+#[derive(Serialize, Deserialize, PartialEq, Debug)]
+pub struct LinkSpec {
+    source: String,
+    target: String,
+    mode: LinkMode
+}
+
+#[derive(Serialize, Deserialize, PartialEq, Debug, Clone)]
+pub enum LinkMode {
+    Soft,
+    Hard,
+    Copy
+}
+
+impl FromStr for HookExecutionTime {
+    type Err = io::Error;
+
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        match s {
+            "presetup" | "pre-setup" => Ok(Self::Presetup),
+            "postsetup" | "post-setup" => Ok(Self::Postsetup),
+            "preteardown" | "pre-teardown" => Ok(Self::Preteardown),
+            "postteardown" | "post-teardown" => Ok(Self::Postteardown),
+            _ => Err(io::Error::new(
+                    io::ErrorKind::InvalidInput, 
+                    format!("Expected one of [presetup, postsetup, preteardown, postteardown]. Got {}", s)
+                    ))
+        }
+    }
+}
+
+impl FromStr for LinkMode {
+    type Err = io::Error;
+
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        match s {
+            "Soft" | "soft" => Ok(Self::Soft),
+            "Hard" | "hard" => Ok(Self::Hard),
+            "Copy" | "copy" => Ok(Self::Copy),
+            _ => Err(io::Error::new(
+                        std::io::ErrorKind::InvalidInput,
+                        format!("Expected one of: [soft, hard, copy]. Got {}", s)
+                        ))
+        }
+    }
+}
+
 impl FromStr for ConfigStatus {
     type Err = io::Error;
 
@@ -56,37 +114,6 @@ impl FromStr for ConfigStatus {
     }
 }
 
-impl DotfileConfiguration {
-    pub fn all_configs(&self) -> impl Iterator<Item = &ConfigSpec> {
-        self.configurations.iter()
-    }
-
-    pub fn config_repo(&self) -> &String {
-        &self.options.repository
-    }
-}
-
-impl ConfigSpec {
-    pub fn assigned_name(&self) -> &String {
-        &self.name
-    }
-
-    pub fn config_os(&self) -> &String {
-        &self.os
-    }
-
-    pub fn config_status(&self) -> &ConfigStatus {
-        &self.status
-    }
-
-    pub fn links(&self) -> std::slice::Iter<'_, LinkSpec> {
-        self.links.iter()
-    }
-
-    pub fn hooks(&self) -> Option<std::slice::Iter<'_, HookSpec>> {
-        self.hooks.as_ref().map(| h | h.iter())
-    }
-}
 
 pub fn read_config() -> Result<DotfileConfiguration, io::Error> {
     let file = match File::open(CONFIG_FILE.resolve()) {
