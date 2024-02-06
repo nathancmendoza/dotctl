@@ -10,7 +10,6 @@ use resolve_path::PathResolveExt;
 
 use std::fs::File;
 use std::io::{self, BufReader};
-use std::str::FromStr;
 
 pub const CONFIG_FILE: &str = "~/.dotctl";
 
@@ -66,50 +65,6 @@ pub struct LinkSpec {
 pub enum LinkMode {
     Link,
     Copy
-}
-
-impl FromStr for HookExecutionTime {
-    type Err = io::Error;
-
-    fn from_str(s: &str) -> Result<Self, Self::Err> {
-        match s {
-            "presetup" | "pre-setup" => Ok(Self::Presetup),
-            "postsetup" | "post-setup" => Ok(Self::Postsetup),
-            "preteardown" | "pre-teardown" => Ok(Self::Preteardown),
-            "postteardown" | "post-teardown" => Ok(Self::Postteardown),
-            _ => Err(io::Error::new(
-                    io::ErrorKind::InvalidInput, 
-                    format!("Expected one of [presetup, postsetup, preteardown, postteardown]. Got {}", s)
-                    ))
-        }
-    }
-}
-
-impl FromStr for LinkMode {
-    type Err = io::Error;
-
-    fn from_str(s: &str) -> Result<Self, Self::Err> {
-        match s {
-            "Link" | "link" => Ok(Self::Link),
-            "Copy" | "copy" => Ok(Self::Copy),
-            _ => Err(io::Error::new(
-                        std::io::ErrorKind::InvalidInput,
-                        format!("Expected one of: [Link, Copy]. Got {}", s)
-                        ))
-        }
-    }
-}
-
-impl FromStr for ConfigStatus {
-    type Err = io::Error;
-
-    fn from_str(s: &str) -> Result<Self, Self::Err> {
-        match s {
-            "active" | "Active" => Ok(Self::Active),
-            "archived" | "Archived" => Ok(Self::Archived),
-            _ => Err(io::Error::new(io::ErrorKind::InvalidInput, format!("Expected one of: [active, archived]. Got {}", s)))
-        }
-    }
 }
 
 
