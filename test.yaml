@@ -44,7 +44,7 @@ configurations:
     hooks:
       - commands:
         - mkdir -p ~/.ssh
-        when: PRESETUP
+        when: Presetup
   - name: vim
     status: Unused
     os: macos
@@ -53,6 +53,14 @@ configurations:
         source: vim/config.vim
         target: ~/.vimrc
         mode: Soft
+    hooks:
+      - when: Presetup
+        commands:
+          - ls
+          - echo hello world
+      - when: Postsetup
+        commands:
+          - pwd
   - name: nvim
     status: Ready
     os: macos

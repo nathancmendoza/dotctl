@@ -12,6 +12,7 @@ use crate::hooks::HookSpec;
 
 use std::fs::File;
 use std::io::{self, BufReader};
+use std::iter;
 use std::str::FromStr;
 
 pub const CONFIG_FILE: &str = "~/.dotctl";
@@ -78,16 +79,13 @@ impl ConfigSpec {
         &self.status
     }
 
-    pub fn links(&self) -> impl Iterator<Item = &LinkSpec> {
+    pub fn links(&self) -> std::slice::Iter<'_, LinkSpec> {
         self.links.iter()
     }
 
-//    pub fn hooks(&self) -> impl Iterator<Item = &HookSpec> {
-//        match self.hooks {
-//            Some(list) => list.iter(),
-//            None => std::iter::empty()
-//        }
-//    }
+    pub fn hooks(&self) -> Option<std::slice::Iter<'_, HookSpec>> {
+        self.hooks.as_ref().map(| h | h.iter())
+    }
 }
 
 pub fn read_config() -> Result<DotfileConfiguration, io::Error> {

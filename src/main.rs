@@ -8,7 +8,6 @@ mod links;
 mod hooks;
 mod cli;
 
-use std::error::Error;
 use std::env;
 use std::io;
 
@@ -17,6 +16,8 @@ use clap::Parser;
 use crate::cli::DotctlInvocation;
 use crate::config::{read_config, CONFIG_FILE};
 use crate::links::{setup_link, LinkSpec, LinkMode, teardown_link};
+use crate::hooks::{HookExecutionTime, HookSpec};
+
 
 fn use_config(config_path: &str) -> io::Result<()> {
     let config_link_spec = LinkSpec::new(config_path, CONFIG_FILE, LinkMode::Soft);
@@ -27,8 +28,18 @@ fn use_config(config_path: &str) -> io::Result<()> {
 fn setup_config(app_conf: &str) -> Result<(), std::io::Error> {
     let configs = read_config()?;
     for item in configs.all_configs().filter(| config | *config.assigned_name() == app_conf).filter(| config | config.config_os() == std::env::consts::OS) {
+        if let Some(prehooks) = item.hooks() {
+            prehooks
+                .filter(|h| *h.execute_time() == HookExecutionTime::Presetup)
+                .for_each(| cmds | { cmds.try_run_all().expect("Hooks failed to run"); });
+        }
         for link in item.links() {
             setup_link(link, configs.config_repo())?;
+        }
+        if let Some(posthooks) = item.hooks() {
+            posthooks
+                .filter(|h| *h.execute_time() == HookExecutionTime::Postsetup)
+                .for_each(| cmds | { cmds.try_run_all().expect("Hooks failed to run"); });
         }
     }
     Ok(())
@@ -45,7 +56,7 @@ fn teardown_config(app_conf: &str) -> io::Result<()> {
     Ok(())
 }
 
-fn main() -> Result<(), Box<dyn Error>> {
+fn main() -> io::Result<()> {
     let invoke = DotctlInvocation::parse();
     match invoke.action {
         cli::DotctlActionWord::Use { config_path } => {
