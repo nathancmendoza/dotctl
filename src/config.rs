@@ -37,8 +37,8 @@ pub struct ConfigSpec {
 
 #[derive(Serialize, Deserialize, PartialEq, Debug)]
 pub enum ConfigStatus {
-    Ready,
-    Unused,
+    Active,
+    Archived,
 }
 
 #[derive(Serialize, Deserialize, PartialEq, Debug)]
@@ -64,8 +64,7 @@ pub struct LinkSpec {
 
 #[derive(Serialize, Deserialize, PartialEq, Debug, Clone)]
 pub enum LinkMode {
-    Soft,
-    Hard,
+    Link,
     Copy
 }
 
@@ -91,12 +90,11 @@ impl FromStr for LinkMode {
 
     fn from_str(s: &str) -> Result<Self, Self::Err> {
         match s {
-            "Soft" | "soft" => Ok(Self::Soft),
-            "Hard" | "hard" => Ok(Self::Hard),
+            "Link" | "link" => Ok(Self::Link),
             "Copy" | "copy" => Ok(Self::Copy),
             _ => Err(io::Error::new(
                         std::io::ErrorKind::InvalidInput,
-                        format!("Expected one of: [soft, hard, copy]. Got {}", s)
+                        format!("Expected one of: [Link, Copy]. Got {}", s)
                         ))
         }
     }
@@ -107,9 +105,9 @@ impl FromStr for ConfigStatus {
 
     fn from_str(s: &str) -> Result<Self, Self::Err> {
         match s {
-            "ready" | "Ready" => Ok(Self::Ready),
-            "unused" | "Unused" => Ok(Self::Unused),
-            _ => Err(io::Error::new(io::ErrorKind::InvalidInput, format!("Expected one of: [ready, unused]. Got {}", s)))
+            "active" | "Active" => Ok(Self::Active),
+            "archived" | "Archived" => Ok(Self::Archived),
+            _ => Err(io::Error::new(io::ErrorKind::InvalidInput, format!("Expected one of: [active, archived]. Got {}", s)))
         }
     }
 }
