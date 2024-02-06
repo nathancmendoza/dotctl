@@ -68,12 +68,8 @@ pub enum LinkMode {
 }
 
 
-pub fn read_config() -> Result<DotfileConfiguration, io::Error> {
-    let file = match File::open(CONFIG_FILE.resolve()) {
-        Ok(the_file) => the_file,
-        Err(_) => return Err(io::Error::new(io::ErrorKind::NotFound, format!("The configuration file was not found")))
-    };
-
+pub fn read_config() -> io::Result<DotfileConfiguration> {
+    let file = File::open(CONFIG_FILE.try_resolve()?)?;
     let reader = BufReader::new(file);
 
     match from_reader(reader) {
