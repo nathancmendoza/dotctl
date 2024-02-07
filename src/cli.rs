@@ -15,10 +15,10 @@ pub enum DotctlActionWord {
         config_path: String,
     },
     Setup{
-        app_conf: String,
+        application: String,
     },
     Teardown{
-        app_conf: String,
+        application: String,
     },
 }
 
