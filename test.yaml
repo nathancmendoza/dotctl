@@ -34,10 +34,6 @@ configurations:
       - source: ssh/config
         target: ~/.ssh/config
         mode: Copy
-    hooks:
-      - commands:
-        - mkdir -p ~/.ssh
-        when: Presetup
   - name: vim
     status: Archived
     os: macos
@@ -45,14 +41,6 @@ configurations:
       - source: vim/config.vim
         target: ~/.vimrc
         mode: Link
-    hooks:
-      - when: Presetup
-        commands:
-          - ls
-          - echo hello world
-      - when: Postsetup
-        commands:
-          - pwd
   - name: nvim
     status: Active
     os: macos

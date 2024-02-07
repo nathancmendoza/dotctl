@@ -30,7 +30,6 @@ pub struct ConfigSpec {
     os: String,
     status: ConfigStatus,
     links: Vec<LinkSpec>,
-    hooks: Option<Vec<HookSpec>>
 }
 
 
@@ -38,20 +37,6 @@ pub struct ConfigSpec {
 pub enum ConfigStatus {
     Active,
     Archived,
-}
-
-#[derive(Serialize, Deserialize, PartialEq, Debug)]
-pub struct HookSpec {
-    commands: Vec<String>,
-    when: HookExecutionTime
-}
-
-#[derive(Serialize, Deserialize, PartialEq, Debug)]
-pub enum HookExecutionTime {
-    Presetup,
-    Postsetup,
-    Preteardown,
-    Postteardown
 }
 
 #[derive(Serialize, Deserialize, PartialEq, Debug)]
