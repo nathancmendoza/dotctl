@@ -5,40 +5,33 @@ configurations:
     status: Active
     os: linux
     links:
-    - name: init
-      source: bash/init.sh
+    - source: bash/init.sh
       target: ~/.bashrc
       mode: Link
-    - name: aliases
-      source: bash/aliases.sh
+    - source: bash/aliases.sh
       target: ~/.aliases
       mode: Copy
-    - name: functions
-      source: bash/functions.sh
+    - source: bash/functions.sh
       target: ~/.functions
       mode: Copy
   - name: bash
     status: Archived
     os: macos
     links:
-    - name: init
-      source: bash/init.sh
+    - source: bash/init.sh
       target: ~/.bashrc
       mode: Link
-    - name: aliases
-      source: bash/aliases.sh
+    - source: bash/aliases.sh
       target: ~/.aliases
       mode: Copy
-    - name: functions
-      source: bash/functions.sh
+    - source: bash/functions.sh
       target: ~/.functions
       mode: Copy
   - name: ssh
     status: Active
     os: macos
     links:
-      - name: config
-        source: ssh/config
+      - source: ssh/config
         target: ~/.ssh/config
         mode: Copy
     hooks:
@@ -49,8 +42,7 @@ configurations:
     status: Archived
     os: macos
     links:
-      - name: config
-        source: vim/config.vim
+      - source: vim/config.vim
         target: ~/.vimrc
         mode: Link
     hooks:
@@ -65,11 +57,9 @@ configurations:
     status: Active
     os: macos
     links:
-      - name: init
-        source: nvim/init.lua
+      - source: nvim/init.lua
         target: ~/.config/nvim/init.lua
         mode: Copy
-      - name: lua dir
-        source: nvim/lua/
+      - source: nvim/lua/
         target: ~/.config/nvim/lua/
         mode: Copy
